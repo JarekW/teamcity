@@ -1,0 +1,30 @@
+version: '2'
+
+services:
+    server:
+        image: jetbrains/teamcity-server
+        container_name: teamcity-server
+        ports:
+            - 8111:8111
+        volumes:
+            - ./server/data:/data/teamcity_server/datadir
+            - ./server/logs:/opt/teamcity/logs
+            - /home/jarek/workspace/express-pozyczki:/repository
+    agent:
+        build: agent/docker
+        container_name: teamcity-agent
+        volumes:
+            - ./agent/conf:/data/teamcity_agent/conf
+            - /home/jarek/workspace/express-pozyczki:/repository
+            - ./agent/composer:/root/.composer
+            - /usr/local/bin:/usr/local/bin
+        environment:
+            SERVER_URL: 'teamcity-server:8111'
+    mysql:
+        image: mysql:5.6
+        container_name: teamcity-mysql
+        environment:
+            MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    selenium:
+        image: selenium/standalone-firefox:2.53.0
+        container_name: teamcity-selenium
